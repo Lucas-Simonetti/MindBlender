@@ -36,6 +36,11 @@ public class Player : MonoBehaviour
     private Animator animator;
     private Vector2 lastMoveDirection;
 
+    [Header("Audio")]
+    public AudioSource caixaEfeitos;
+    public AudioClip passos;
+    public bool canLoop;
+
     private void Awake()
     {
         instancia = this;
@@ -69,18 +74,22 @@ public class Player : MonoBehaviour
             inputY = 0;
             corrida = 0;
         }
-        
+        if(corpoPlayer.velocity.x != 0 || corpoPlayer.velocity.y != 0 && !caixaEfeitos.isPlaying)
+        {
+            LoopSound(passos);
+        }
+
     }
 
     private void FixedUpdate()
     {
         if(corrida == 1)
         {
-            velocidade = 4;
+            velocidade = 2;
         }
         else
         {
-            velocidade = 2;
+            velocidade = 1;
         }
 
         corpoPlayer.velocity = new Vector2(inputX * velocidade, inputY * velocidade);
@@ -126,6 +135,21 @@ public class Player : MonoBehaviour
         animator.SetFloat("AnimMoveMagnitude", corpoPlayer.velocity.magnitude);
         animator.SetFloat("AnimLastMoveX", lastMoveDirection.x);
         animator.SetFloat("AnimLastMoveY", lastMoveDirection.y);
+    }
+
+    public void LoopSound(AudioClip clip)
+    {
+        if (canLoop)
+        {
+            caixaEfeitos.PlayOneShot(clip);
+            StartCoroutine("LoopRotine");
+            canLoop = false;
+        }
+    }
+    IEnumerator LoopRotine()
+    {
+        yield return new WaitForSeconds(0.3F);
+        canLoop = true;
     }
 
 }
