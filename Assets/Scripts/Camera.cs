@@ -7,27 +7,64 @@ public class Camera : MonoBehaviour
 {
 
     public PolygonCollider2D areaCamera;
-    public float ativarCamera;
-
+    public int bateria;
+    public float ativarCamera, desativarCamera;
+    public bool cameraAtiva, pressed;
 
     // Start is called before the first frame update
     void Start()
     {
-        
-    }
 
+    }
+    private void Update()
+    {
+        ativarCamera = Input.GetAxisRaw("Fire2");
+    }
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        if (ativarCamera != 0 && bateria > 0 && cameraAtiva == false && !pressed)
+        {
+            cameraAtiva = true;
+            StartCoroutine(gravador());
+            StartCoroutine(Pressed());
+        }
+        if (ativarCamera != 0 && cameraAtiva == true && !pressed)
+        {
+            cameraAtiva = false;
+            StopAllCoroutines();
+            StartCoroutine(Pressed());
+        }
+    }
+    IEnumerator Pressed()
+    {
+        pressed = true;
+        yield return new WaitForSeconds(0.3f);
+        pressed = false;
+    }
+    IEnumerator gravador()
+    {
+        while (bateria > 0)
+        {
+            yield return new WaitForSeconds(1);
+            bateria--;
+        }
+        cameraAtiva = false;
+        StopCoroutine(gravador());
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        ativarCamera = Input.GetAxis("Fire2");
-        if (ativarCamera != 0 && collision.gameObject.CompareTag("Alucinacao"))
+        if (collision.gameObject.CompareTag("Alucinacao") && cameraAtiva == true)
         {
-            Destroy(collision.gameObject);
+            collision.gameObject.GetComponent<Alucinacao>().Desativar();
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Alucinacao"))
+        {
+            collision.gameObject.GetComponent<Alucinacao>().Ativar();
         }
     }
 }
