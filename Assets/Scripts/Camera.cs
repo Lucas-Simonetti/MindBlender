@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public class Camera : MonoBehaviour
 {
+    public static Camera instancia;
+
 
     public PolygonCollider2D areaCamera;
     public int bateria;

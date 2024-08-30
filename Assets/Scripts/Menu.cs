@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class Menu : MonoBehaviour
 {
+    public static Menu instancia;
+
     [SerializeField] private string Jogo;
     [SerializeField] public GameObject painelMenuInicial;
     [SerializeField] public GameObject painelConfigurations;
@@ -25,6 +27,13 @@ public class Menu : MonoBehaviour
     [Header("Sliders")]
     public Slider sliderMusic;
     public Slider sliderEffects;
+    public float valorSliderMusic;
+    public float valorSliderEffects;
+
+    private void Awake()
+    {
+        instancia = this;
+    }
 
     private void Start()
     {
@@ -40,6 +49,9 @@ public class Menu : MonoBehaviour
     {
         caixaDeMusica.volume = sliderMusic.value;
         caixaDeEfeitos.volume = sliderEffects.value;
+
+        valorSliderMusic = sliderMusic.value;
+        valorSliderEffects = sliderEffects.value;
     }
 
     public void ApertarBotao()

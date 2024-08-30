@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Presets;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -13,9 +11,10 @@ public class Player : MonoBehaviour
     [Header("Componentes")]
     public Rigidbody2D corpoPlayer;
     public CapsuleCollider2D colisorPlayer;
+    public CircleCollider2D pePlayer;
     public Animator animatorPlayer;
-    public GameObject item;
     public List<ItemHistoria> historias;
+    public SpriteRenderer spriteRenderer;
     public bool podeMover;
 
     [Header("Movimentação")]
@@ -30,7 +29,6 @@ public class Player : MonoBehaviour
     [Header("Lanterna")]
     public Transform lanterna;
     public Transform gravador;
-    public int vel;
 
     [Header("Animações")]
     private Animator animator;
@@ -38,8 +36,12 @@ public class Player : MonoBehaviour
 
     [Header("Audio")]
     public AudioSource caixaEfeitos;
+    public AudioSource caixaMusica;
     public AudioClip passos;
+    public AudioClip musica;
     public bool canLoop;
+    public Slider sliderMusic;
+    public Slider sliderEffects;
 
     private void Awake()
     {
@@ -49,8 +51,12 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        sliderMusic.value = Menu.instancia.valorSliderMusic;
+        sliderEffects.value = Menu.instancia.valorSliderEffects;
         animator = GetComponent<Animator>();
         podeMover = true;
+        caixaMusica.clip = musica;
+        caixaMusica.Play();
     }
 
     // Update is called once per frame
@@ -78,7 +84,8 @@ public class Player : MonoBehaviour
         {
             LoopSound(passos);
         }
-
+        caixaMusica.volume = sliderMusic.value;
+        caixaEfeitos.volume = sliderEffects.value;
     }
 
     private void FixedUpdate()
@@ -110,10 +117,9 @@ public class Player : MonoBehaviour
         }
 
         UpdateAnimationState();
-
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         pegarItem = Input.GetAxis("Fire1");
         if (pegarItem != 0 && collision.gameObject.CompareTag("Item"))
@@ -137,6 +143,7 @@ public class Player : MonoBehaviour
         animator.SetFloat("AnimLastMoveY", lastMoveDirection.y);
     }
 
+
     public void LoopSound(AudioClip clip)
     {
         if (canLoop)
@@ -151,5 +158,19 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(0.3F);
         canLoop = true;
     }
+
+    public void MudarCamada()
+    {
+        spriteRenderer.sortingOrder = 8;
+    }
+    public void VoltarCamada()
+    {
+        spriteRenderer.sortingOrder = 10;
+    }
+    public void MudarCamadaEstranha()
+    {
+        spriteRenderer.sortingOrder = 7;
+    }
+
 
 }
