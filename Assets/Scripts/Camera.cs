@@ -11,11 +11,12 @@ public class Camera : MonoBehaviour
     public int bateria;
     public float ativarCamera, desativarCamera;
     public bool cameraAtiva, pressed;
+    public GameObject gravando;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        gravando.SetActive(false);
     }
     private void Update()
     {
@@ -27,14 +28,20 @@ public class Camera : MonoBehaviour
         if (ativarCamera != 0 && bateria > 0 && cameraAtiva == false && !pressed)
         {
             cameraAtiva = true;
+            gravando.SetActive(true);
             StartCoroutine(gravador());
             StartCoroutine(Pressed());
         }
         if (ativarCamera != 0 && cameraAtiva == true && !pressed)
         {
             cameraAtiva = false;
+            gravando.SetActive(false);
             StopAllCoroutines();
             StartCoroutine(Pressed());
+        }
+        if (cameraAtiva == false)
+        {
+            gravando.SetActive(false);
         }
     }
     IEnumerator Pressed()

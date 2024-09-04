@@ -15,16 +15,18 @@ public class Player : MonoBehaviour
     public Animator animatorPlayer;
     public List<ItemHistoria> historias;
     public SpriteRenderer spriteRenderer;
-    public bool podeMover;
+    public GameObject colisorPorta;
 
     [Header("Movimentação")]
+    public bool podeMover;
     public float inputX ;
     public float inputY;
     public float velocidade;
     public float corrida;
 
     [Header("interações")]
-    public float pegarItem;
+    public float interacao;
+    public bool pegouChave;
 
     [Header("Lanterna")]
     public Transform lanterna;
@@ -35,13 +37,17 @@ public class Player : MonoBehaviour
     private Vector2 lastMoveDirection;
 
     [Header("Audio")]
+    public bool canLoop;
     public AudioSource caixaEfeitos;
     public AudioSource caixaMusica;
     public AudioClip passos;
     public AudioClip musica;
-    public bool canLoop;
+    public AudioClip chaves;
     public Slider sliderMusic;
     public Slider sliderEffects;
+
+    [Header("UI")]
+    public GameObject chave;
 
     private void Awake()
     {
@@ -57,6 +63,8 @@ public class Player : MonoBehaviour
         podeMover = true;
         caixaMusica.clip = musica;
         caixaMusica.Play();
+        chave.SetActive(false);
+        colisorPorta.SetActive(true);
     }
 
     // Update is called once per frame
@@ -67,6 +75,7 @@ public class Player : MonoBehaviour
             inputX = Input.GetAxis("Horizontal");
             inputY = Input.GetAxis("Vertical");
             corrida = Input.GetAxis("Fire3");
+
 
             if((inputX == 0 && inputY == 0) && corpoPlayer.velocity.x != 0 || corpoPlayer.velocity.y != 0)
             {
@@ -86,6 +95,11 @@ public class Player : MonoBehaviour
         }
         caixaMusica.volume = sliderMusic.value;
         caixaEfeitos.volume = sliderEffects.value;
+
+        if(pegouChave == true && interacao != 0)
+        {
+            Destroy(colisorPorta);
+        }
     }
 
     private void FixedUpdate()
@@ -121,16 +135,18 @@ public class Player : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        pegarItem = Input.GetAxis("Fire1");
-        if (pegarItem != 0 && collision.gameObject.CompareTag("Item"))
+        interacao = Input.GetAxis("Fire1");
+        if (interacao != 0 && collision.gameObject.CompareTag("Item"))
         {
+            caixaEfeitos.PlayOneShot(chaves);
+            chave.SetActive(true);
+            pegouChave = true;
             Destroy(collision.gameObject);
         }
-        if (pegarItem != 0 && collision.gameObject.GetComponent<ItemHistoria>())
+        if (interacao != 0 && collision.gameObject.GetComponent<ItemHistoria>())
         {
             collision.gameObject.GetComponent<ItemHistoria>().MostrarCarta();
             podeMover = false;
-            Destroy(collision.gameObject);
         }
     }
 

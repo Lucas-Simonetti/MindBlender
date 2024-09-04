@@ -29,7 +29,7 @@ public class PePlayer : MonoBehaviour
             collision.gameObject.GetComponent<ParedesExtras>().RemoverParedes();
             Player.instancia.MudarCamadaEstranha();
         }
-        if (Player.instancia.pegarItem != 0 && collision.gameObject.CompareTag("Alucinacao"))
+        if (Player.instancia.interacao != 0 && collision.gameObject.CompareTag("Alucinacao"))
         {
             collision.gameObject.GetComponent<Animator>().Rebind();
             collision.gameObject.GetComponent<Animator>().Play("Chave Alucinacao 3");
