@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Monstro : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Monstro : MonoBehaviour
     private Rigidbody2D enemyBody;
     public CapsuleCollider2D colisorMonstro;
     private Animator animator;
+
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +29,13 @@ public class Monstro : MonoBehaviour
         if (Vector3.Distance(transform.position, player.position) <= pursuitRadius)
         {
             MoveTowardsPlayer();
+            Player.instancia.MudarMusica(Player.instancia.musicaPerseguicao);
+        }
+        else
+        {
+            enemyBody.velocity = Vector3.zero;
+            animator.SetInteger("Monstro", 0);
+            Player.instancia.MudarMusica(Player.instancia.musica);
         }
     }
     void MoveTowardsPlayer()

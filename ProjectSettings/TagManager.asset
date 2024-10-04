@@ -8,6 +8,9 @@ TagManager:
   - Alucinacao
   - Item de Historia
   - Porta
+  - Bateria
+  - Tripe
+  - pePlayer
   layers:
   - Default
   - TransparentFX
@@ -18,9 +21,9 @@ TagManager:
   - Parede
   - Camera
   - Chave
-  - 
-  - 
-  - 
+  - Coletavel
+  - Alucinacao
+  - Teleporte
   - 
   - 
   - 

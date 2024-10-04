@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
-
     public static Player instancia;
 
     [Header("Componentes")]
@@ -26,6 +27,7 @@ public class Player : MonoBehaviour
 
     [Header("interações")]
     public float interacao;
+    public float pegarCamera;
     public bool pegouChave;
 
     [Header("Lanterna")]
@@ -42,12 +44,17 @@ public class Player : MonoBehaviour
     public AudioSource caixaMusica;
     public AudioClip passos;
     public AudioClip musica;
+    public AudioClip musicaPerseguicao;
     public AudioClip chaves;
     public Slider sliderMusic;
     public Slider sliderEffects;
 
     [Header("UI")]
     public GameObject chave;
+
+    public int rotacaoCamera = 0;
+    public bool pressed;
+    public bool longPressed;
 
     private void Awake()
     {
@@ -57,14 +64,20 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        sliderMusic.value = Menu.instancia.valorSliderMusic;
-        sliderEffects.value = Menu.instancia.valorSliderEffects;
+        if (Menu.instancia != null)
+        {
+            sliderMusic.value = Menu.instancia.valorSliderMusic;
+            sliderEffects.value = Menu.instancia.valorSliderEffects;
+        }
         animator = GetComponent<Animator>();
         podeMover = true;
         caixaMusica.clip = musica;
         caixaMusica.Play();
         chave.SetActive(false);
         colisorPorta.SetActive(true);
+        lastMoveDirection = new Vector2(0f, 1f);
+        inputX = 0f;
+        inputY = 1f;
     }
 
     // Update is called once per frame
@@ -132,10 +145,22 @@ public class Player : MonoBehaviour
 
         UpdateAnimationState();
     }
-
+    public void MudarMusica(AudioClip estado)
+    {
+       if(caixaMusica.clip == estado)
+        {
+            return;
+        }
+       caixaMusica.clip = estado;
+        caixaMusica.Stop();
+        caixaMusica.Play();
+    }
     private void OnTriggerStay2D(Collider2D collision)
     {
+        //if (collision == null) return;
+
         interacao = Input.GetAxis("Fire1");
+        pegarCamera = Input.GetAxis("Fire4");
         if (interacao != 0 && collision.gameObject.CompareTag("Item"))
         {
             caixaEfeitos.PlayOneShot(chaves);
@@ -143,10 +168,43 @@ public class Player : MonoBehaviour
             pegouChave = true;
             Destroy(collision.gameObject);
         }
+        if (interacao != 0 && collision.CompareTag("Bateria"))
+        {
+            CameraScript.instancia.bateria = 10;
+            Destroy(collision.gameObject);
+        }
+
         if (interacao != 0 && collision.gameObject.GetComponent<ItemHistoria>())
         {
             collision.gameObject.GetComponent<ItemHistoria>().MostrarCarta();
             podeMover = false;
+        }
+        if(collision.gameObject.CompareTag("Tripe"))
+        {
+            if(interacao != 0)
+            {
+                collision.gameObject.GetComponent<Tripe>().MostrarCamera();
+                CameraScript.instancia.podeAtivar = false;
+                CameraScript.instancia.cameraAtiva = false;
+                if (interacao != 0 && collision.gameObject.GetComponent<Tripe>().cameraColocada && !pressed)
+                {
+                    collision.gameObject.GetComponent<Tripe>().luz.transform.Rotate(0, 0, rotacaoCamera + 90);
+                    StopAllCoroutines();
+                    StartCoroutine(Pressed());
+                }
+            }
+            if (pegarCamera != 0 && collision.gameObject.GetComponent<Tripe>().cameraColocada)
+            {
+                collision.gameObject.GetComponent<Tripe>().cameraColocada = false;
+                collision.gameObject.GetComponent<Tripe>().EsconderCamera();
+                CameraScript.instancia.podeAtivar = true;
+            }
+        }
+        if (interacao != 0 && collision.gameObject.GetComponent<TeleportPortas>())
+        {
+            corpoPlayer.transform.position = collision.gameObject.GetComponent<TeleportPortas>().pontoTeleporte.transform.position;
+            collision.gameObject.GetComponent<TeleportPortas>().cenarioAntigo.SetActive(false);
+            collision.gameObject.GetComponent<TeleportPortas>().cenarioNovo.SetActive(true);
         }
     }
 
@@ -187,6 +245,10 @@ public class Player : MonoBehaviour
     {
         spriteRenderer.sortingOrder = 7;
     }
-
-
+    IEnumerator Pressed()
+    {
+        pressed = true;
+        yield return new WaitForSeconds(0.3f);
+        pressed = false;
+    }
 }

@@ -9,7 +9,6 @@ public class ItemHistoria : MonoBehaviour
 
     [Header("Componentes")]
     [SerializeField] public GameObject painelCarta;
-    public int itemID;
 
     // Start is called before the first frame update
     void Start()
