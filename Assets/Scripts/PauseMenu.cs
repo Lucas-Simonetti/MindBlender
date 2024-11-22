@@ -30,15 +30,16 @@ public class PauseMenu : MonoBehaviour
     public void AbrirPause()
     {
         painelPause.SetActive(true);
-        Player.instancia.podeMover = false;
+        Time.timeScale = 0;
     }
     public void FecharPause()
     {
         painelPause.SetActive(false);
-        Player.instancia.podeMover = true;
+        Time.timeScale = 1;
     }
     public void SairJogo()
     {
         SceneManager.LoadScene(Menu);
+        Time.timeScale = 1;
     }
 }

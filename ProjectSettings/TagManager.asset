@@ -11,6 +11,9 @@ TagManager:
   - Bateria
   - Tripe
   - pePlayer
+  - Hitbox
+  - TeleportPortas
+  - Bloqueio
   layers:
   - Default
   - TransparentFX
@@ -24,8 +27,8 @@ TagManager:
   - Coletavel
   - Alucinacao
   - Teleporte
-  - 
-  - 
+  - Hitbox
+  - Porta
   - 
   - 
   - 

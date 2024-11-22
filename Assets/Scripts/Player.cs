@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
 
     [Header("Movimentação")]
     public bool podeMover;
-    public float inputX ;
+    public float inputX;
     public float inputY;
     public float velocidade;
     public float corrida;
@@ -83,14 +83,14 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(podeMover == true)
+        if (podeMover == true)
         {
             inputX = Input.GetAxis("Horizontal");
             inputY = Input.GetAxis("Vertical");
             corrida = Input.GetAxis("Fire3");
 
 
-            if((inputX == 0 && inputY == 0) && corpoPlayer.velocity.x != 0 || corpoPlayer.velocity.y != 0)
+            if ((inputX == 0 && inputY == 0) && corpoPlayer.velocity.x != 0 || corpoPlayer.velocity.y != 0)
             {
                 lastMoveDirection = corpoPlayer.velocity;
             }
@@ -102,14 +102,14 @@ public class Player : MonoBehaviour
             inputY = 0;
             corrida = 0;
         }
-        if(corpoPlayer.velocity.x != 0 || corpoPlayer.velocity.y != 0 && !caixaEfeitos.isPlaying)
+        if (corpoPlayer.velocity.x != 0 || corpoPlayer.velocity.y != 0 && !caixaEfeitos.isPlaying)
         {
             LoopSound(passos);
         }
         caixaMusica.volume = sliderMusic.value;
         caixaEfeitos.volume = sliderEffects.value;
 
-        if(pegouChave == true && interacao != 0)
+        if (pegouChave == true && interacao != 0)
         {
             Destroy(colisorPorta);
         }
@@ -117,17 +117,17 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(corrida == 1)
+        if (corrida == 1)
         {
-            velocidade = 2;
+            velocidade = 6;
         }
         else
         {
-            velocidade = 1;
+            velocidade = 3;
         }
 
         corpoPlayer.velocity = new Vector2(inputX * velocidade, inputY * velocidade);
-        Vector2 movement = new Vector2(inputY, inputX*-1);
+        Vector2 movement = new Vector2(inputY, inputX * -1);
 
         // Make the movement more fluid by using SmoothDamp
         movement = Vector2.SmoothDamp(movement, movement, ref movement, 0.1f);
@@ -147,11 +147,11 @@ public class Player : MonoBehaviour
     }
     public void MudarMusica(AudioClip estado)
     {
-       if(caixaMusica.clip == estado)
+        if (caixaMusica.clip == estado)
         {
             return;
         }
-       caixaMusica.clip = estado;
+        caixaMusica.clip = estado;
         caixaMusica.Stop();
         caixaMusica.Play();
     }
@@ -174,37 +174,58 @@ public class Player : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
-        if (interacao != 0 && collision.gameObject.GetComponent<ItemHistoria>())
+        if (collision.gameObject.CompareTag("TeleportPortas"))
         {
-            collision.gameObject.GetComponent<ItemHistoria>().MostrarCarta();
-            podeMover = false;
+            if (interacao != 0 && collision.gameObject.GetComponent<TeleportPortas>() && pressed == false)
+            {
+                StartCoroutine(Pressed());
+                corpoPlayer.transform.position = collision.gameObject.GetComponent<TeleportPortas>().pontoTeleporte.transform.position;
+            }
         }
-        if(collision.gameObject.CompareTag("Tripe"))
+
+        if (collision.gameObject.CompareTag("Item de Historia"))
         {
-            if(interacao != 0)
+            if (interacao != 0 && collision.gameObject.GetComponent<ItemHistoria>())
+            {
+                collision.gameObject.GetComponent<ItemHistoria>().MostrarCarta();
+                podeMover = false;
+            }
+        }
+        if (collision.gameObject.CompareTag("Tripe"))
+        {
+            if (interacao != 0 && !collision.gameObject.GetComponent<Tripe>().cameraColocada && !pressed)
             {
                 collision.gameObject.GetComponent<Tripe>().MostrarCamera();
                 CameraScript.instancia.podeAtivar = false;
                 CameraScript.instancia.cameraAtiva = false;
-                if (interacao != 0 && collision.gameObject.GetComponent<Tripe>().cameraColocada && !pressed)
-                {
-                    collision.gameObject.GetComponent<Tripe>().luz.transform.Rotate(0, 0, rotacaoCamera + 90);
-                    StopAllCoroutines();
-                    StartCoroutine(Pressed());
-                }
             }
+            if (interacao != 0 && collision.gameObject.GetComponent<Tripe>().cameraColocada && !pressed)
+            {
+                collision.gameObject.GetComponent<Tripe>().luz.transform.Rotate(0, 0, rotacaoCamera - 45);
+                collision.gameObject.GetComponent<Tripe>().UpdatePosition();
+                collision.gameObject.GetComponent<Tripe>().cameraTripe.GetComponent<CameraTripe>().UpdatePosition();
+                //StopAllCoroutines();
+                StartCoroutine(Pressed());
+            }
+
             if (pegarCamera != 0 && collision.gameObject.GetComponent<Tripe>().cameraColocada)
             {
                 collision.gameObject.GetComponent<Tripe>().cameraColocada = false;
                 collision.gameObject.GetComponent<Tripe>().EsconderCamera();
                 CameraScript.instancia.podeAtivar = true;
             }
+
         }
-        if (interacao != 0 && collision.gameObject.GetComponent<TeleportPortas>())
+        if(interacao != 0 && collision.gameObject.CompareTag("Bloqueio"))
         {
-            corpoPlayer.transform.position = collision.gameObject.GetComponent<TeleportPortas>().pontoTeleporte.transform.position;
-            collision.gameObject.GetComponent<TeleportPortas>().cenarioAntigo.SetActive(false);
-            collision.gameObject.GetComponent<TeleportPortas>().cenarioNovo.SetActive(true);
+            collision.gameObject.GetComponent<MoveProps>().Bloquear();
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Hitbox"))
+        {
+            collision.gameObject.GetComponent<Hitbox1>().MudarObjetos();
         }
     }
 

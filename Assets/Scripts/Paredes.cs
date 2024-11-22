@@ -20,7 +20,14 @@ public class Paredes : MonoBehaviour
     {
         
     }
-
+    public void AtivarColisor()
+    {
+        colisor.enabled = true;
+    }
+    public void DesativarColisor()
+    {
+        colisor.enabled = false;
+    }
     public void RemoverParedes()
     {
         spriteRenderer.color = new Color(1, 1, 1, 0.2f);

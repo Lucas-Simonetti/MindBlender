@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class Menu : MonoBehaviour
 {
@@ -92,5 +93,9 @@ public class Menu : MonoBehaviour
     {
         painelKnowMore.SetActive(false);
         painelMenuInicial.SetActive(true);
+    }
+    public void FecharJogo()
+    {
+        Application.Quit();
     }
 }
